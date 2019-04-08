@@ -16,6 +16,12 @@
   <author href="https://build.phonegap.com" email="support@phonegap.com">
       Celso Silva
   </author>
+</widget>
   <icon src="icon.png"/>
+<!-- iOS -->
+<widget id="io.cordova.hellocordova" version="0.0.1" ios-CFBundleVersion="0.1.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+</widget>
 
+<!-- Windows -->
+<widget id="io.cordova.hellocordova" version="0.0.1" windows-packageVersion="0.1.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
 </widget>
