@@ -7,15 +7,14 @@
 
 <!-- versionCode is optional and Android only -->
 
-  <name>EditeSe</name>
+  <name>Celso</name>
 
   <description>
-      Aplicativo para contratação de Edição de Imagens e Vídeos capturadas em dispositivos móveis (Tablets e/ou celulares).
+      An example for Silva build docs.
   </description>
 
   <author href="https://build.phonegap.com" email="support@phonegap.com">
-      Celso Silva
+      Hardeep Shoker
   </author>
-  <icon src="icon.png"/>
 
 </widget>
