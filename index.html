@@ -1,74 +1,81 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel=""stylesheet" href="css/jquery.mobile-1.4.5.css">
-<script src="js/jquery.js"></script>
-<script src="js/jquery.mobile-1.4.5.js"></script>
-</head>
-<body>
-<script type="text/javascript">
-        var camearaOptions = {
-            quality: 100,
-            destinationType: navigator.camera.DestinationType.FILE_URI,
-            sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY
-        }
-        function getImage() {
-            navigator.camera.getPicture(uploadPhoto,onError, camearaOptions);
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'" />
+        <title>PhoneGap app</title>
 
-        function onError(err){ alert(error); }
+        <!-- Script -->
+        <script type="text/javascript" src="js/cordova.js" ></script>
+        <script type='text/javascript' src='js/jquery-3.0.0.js' ></script>
+        <script type='text/javascript'>
 
-        function uploadPhoto(imageURI) {
-            var options = new FileUploadOptions();
-            options.fileKey = "file";
-            options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
-            options.mimeType = "image/jpeg";
-            var ft = new FileTransfer();
-            ft.upload(imageURI, "http://192.168.1.4/phonegap/upload/upload.php",
-            function (result) {
-                console.log(JSON.stringify(result));
-            },
-            function (error) {
-                console.log(JSON.stringify(error));
-            }, options);
-        }
-    </script>
+        $(document).ready(function(){
 
-<!-- Start of first page -->
-<div data-role="page" id="foo">
+            // take picture from camera
+            $('#but_take').click(function(){      
+                navigator.camera.getPicture(onSuccess, onFail, { quality: 20,
+                    destinationType: Camera.DestinationType.FILE_URL 
+                });
+            });
 
-	<div data-role="header">
-		<h1>Foo</h1>
-	</div><!-- /header -->
+            // upload select 
+            $("#but_select").click(function(){
+                navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+                    sourceType: Camera.PictureSourceType.PHOTOLIBRARY, 
+                    allowEdit: true,
+                    destinationType: Camera.DestinationType.FILE_URI
+                });
+                
+            });
 
-	<div role="main" class="ui-content">
-		<p>I'm first in the source order so I'm shown as the page.</p>
-		<p>View internal page called <a href="#bar">bar</a></p>
-	<button onclick="getImage()">Upload a Photo</button>
-	</div><!-- /content -->
+            // Change image source and upload photo to server
+            function onSuccess(imageURI) {
 
-	<div data-role="footer">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
-</div><!-- /page -->
+                // Set image source
+                var image = document.getElementById('img');
+                image.src = imageURI  + '?' + Math.random();
+                
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+                options.mimeType = "image/jpeg";
+                
+                var params = {};
+                params.value1 = "test";
+                params.value2 = "param";
 
-<!-- Start of second page -->
-<div data-role="page" id="bar">
+                options.params = params;
+                options.chunkedMode = false;
 
-	<div data-role="header">
-		<h1>Bar</h1>
-	</div><!-- /header -->
+                var ft = new FileTransfer();
+                ft.upload(imageURI, "http://demo.makitweb.com/phonegap_camera/upload.php", function(result){
+                    alert('successfully uploaded ' + result.response);
+                }, function(error){
+                    alert('error : ' + JSON.stringify(error));
+                }, options);
+                
+            }
 
-	<div role="main" class="ui-content">
-		<p>I'm the second in the source order so I'm hidden when the page loads. I'm just shown if a link that references my id is beeing clicked.</p>
-		<p><a href="#foo">Back to foo</a></p>
-	</div><!-- /content -->
+            function onFail(message) {
+                alert('Failed because: ' + message);
+            }
 
-	<div data-role="footer">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
-</div><!-- /page -->
-</body>
+        });
+        
+        </script>
+    </head>
+    <body>
+        
+		<div style="margin:0 auto; width:30%!important;text-align: center;">
+			<img src="img/cam2.jpg" id='img' style="width: 100px; height: 100px;">
+        </div><br/>
+        <div style="width:100%; text-align:center; padding:10px;">
+
+            <button id='but_take'>Take photo</button>
+            <button id='but_select'>Select photo from Gallery</button>
+           
+        </div>
+        
+    </body>
 </html>
