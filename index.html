@@ -14,16 +14,16 @@
 
             // take picture from camera
             $('#but_take').click(function(){      
-                navigator.camera.getPicture(onSuccess, onFail, { quality: 20,
+                navigator.camera.getPicture(onSuccess, onFail, { quality: 100,
                     destinationType: Camera.DestinationType.FILE_URL 
                 });
             });
 
             // upload select 
             $("#but_select").click(function(){
-                navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+                navigator.camera.getPicture(onSuccess, onFail, { quality: 100,
                     sourceType: Camera.PictureSourceType.PHOTOLIBRARY, 
-                    allowEdit: true,
+                    allowEdit: false,
                     destinationType: Camera.DestinationType.FILE_URI
                 });
                 
