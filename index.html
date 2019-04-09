@@ -1,157 +1,81 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Submit form</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'" />
+        <title>PhoneGap app</title>
 
-    <script type="text/javascript" charset="utf-8" src="js/cordova.js"></script>
-    <script type="text/javascript" charset="utf-8">
+        <!-- Script -->
+        <script type="text/javascript" src="cordova.js" ></script>
+        <script type='text/javascript' src='jquery-3.0.0.js' ></script>
+        <script type='text/javascript'>
 
-    var pictureSource;   // picture source
-    var destinationType; // sets the format of returned value
+        $(document).ready(function(){
 
-    // Wait for device API libraries to load
-    //
-    document.addEventListener("deviceready",onDeviceReady,false);
+            // take picture from camera
+            $('#but_take').click(function(){      
+                navigator.camera.getPicture(onSuccess, onFail, { quality: 20,
+                    destinationType: Camera.DestinationType.FILE_URL 
+                });
+            });
 
-    // device APIs are available
-    //
-    function onDeviceReady() {
-        pictureSource = navigator.camera.PictureSourceType;
-        destinationType = navigator.camera.DestinationType;
-    }
+            // upload select 
+            $("#but_select").click(function(){
+                navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+                    sourceType: Camera.PictureSourceType.PHOTOLIBRARY, 
+                    allowEdit: true,
+                    destinationType: Camera.DestinationType.FILE_URI
+                });
+                
+            });
 
+            // Change image source and upload photo to server
+            function onSuccess(imageURI) {
 
-    // Called when a photo is successfully retrieved
-    //
-   /* function onPhotoURISuccess(imageURI) {
+                // Set image source
+                var image = document.getElementById('img');
+                image.src = imageURI  + '?' + Math.random();
+                
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+                options.mimeType = "image/jpeg";
+                
+                var params = {};
+                params.value1 = "test";
+                params.value2 = "param";
 
-        // Show the selected image
-        var smallImage = document.getElementById('smallImage');
-        smallImage.style.display = 'block';
-        smallImage.src = imageURI;
-    }*/
+                options.params = params;
+                options.chunkedMode = false;
 
-     function onPhotoDataSuccess1(imageData) {
+                var ft = new FileTransfer();
+                ft.upload(imageURI, "http://demo.makitweb.com/phonegap_camera/upload.php", function(result){
+                    alert('successfully uploaded ' + result.response);
+                }, function(error){
+                    alert('error : ' + JSON.stringify(error));
+                }, options);
+                
+            }
 
-      var smallImage1 = document.getElementById('smallImage1');
-      smallImage1.style.display = 'block';
-      smallImage1.src = "data:image/jpeg;base64," + imageData;
-    }
-     function onPhotoDataSuccess2(imageData) {
+            function onFail(message) {
+                alert('Failed because: ' + message);
+            }
 
-      var smallImage2 = document.getElementById('smallImage2');
-      smallImage2.style.display = 'block';
-      smallImage2.src = "data:image/jpeg;base64," + imageData;
-    }
-     function onPhotoDataSuccess3(imageData) {
-
-      var smallImage3 = document.getElementById('smallImage3');
-      smallImage3.style.display = 'block';
-      smallImage3.src = "data:image/jpeg;base64," + imageData;
-    }
-
-    function capturePhoto1() {
-        // Take picture using device camera and retrieve image as base64-encoded string
-        navigator.camera.getPicture(onPhotoDataSuccess1, onFail, { quality: 20,
-          destinationType: destinationType.DATA_URL,
-
-          });
-      }
-      function capturePhoto2() {
-        // Take picture using device camera and retrieve image as base64-encoded string
-        navigator.camera.getPicture(onPhotoDataSuccess2, onFail, { quality: 20,
-          destinationType: destinationType.DATA_URL,
-
-          });
-      }
-      function capturePhoto3() {
-        // Take picture using device camera and retrieve image as base64-encoded string
-        navigator.camera.getPicture(onPhotoDataSuccess3, onFail, { quality: 20,
-          destinationType: destinationType.DATA_URL,
-
-          });
-      }
-
-    // A button will call this function
-    /*
-    function getPhoto(source) {
-      // Retrieve image file location from specified source
-      navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 20,
-        destinationType: destinationType.FILE_URI,
-        sourceType: source });
-    }*/
-
-     //selected photo URI is in the src attribute (we set this on getPhoto)
-        var imageURI1 = document.getElementById('smallImage1').getAttribute("src");
-        var imageURI2 = document.getElementById('smallImage2').getAttribute("src");
-        var imageURI3 = document.getElementById('smallImage3').getAttribute("src");
-        if (!imageURI1) {
-            alert('Please select an image first.');
-            return;
-        }
-
-        var items = [imageURI1,imageURI2,imageURI3];
-        $.each(items,function(){
-            uploadPhoto($(this));
         });
+        
+        </script>
+    </head>
+    <body>
+        
+		<div style="margin:0 auto; width:30%!important;text-align: center;">
+			<img src="img/cam2.jpg" id='img' style="width: 100px; height: 100px;">
+        </div><br/>
+        <div style="width:100%; text-align:center; padding:10px;">
 
-
-    function uploadPhoto(imageURI) {
-
-        //set upload options
-        var options = new FileUploadOptions();
-        options.fileKey = "file";
-        options.fileName = imageURI.substr(imageURI.lastIndexOf('/')+1);
-        options.mimeType = "image/jpeg";
-
-        options.params = {
-            firstname: document.getElementById("firstname").value,
-            lastname: document.getElementById("lastname").value,
-            workplace: document.getElementById("workplace").value
-        }
-
-        var ft = new FileTransfer();
-        ft.upload(imageURI, encodeURI("http://www.xyz.co/AppData/upload.php"), win, fail, options);
-    }
-
-    // Called if something bad happens.
-    //
-    function onFail(message) {
-      console.log('Failed because: ' + message);
-    }
-
-    function win(r) {
-        console.log("Code = " + r.responseCode);
-        console.log("Response = " + r.response);
-        //alert("Response =" + r.response);
-        console.log("Sent = " + r.bytesSent);
-    }
-
-    function fail(error) {
-        alert("An error has occurred: Code = " + error.code);
-        console.log("upload error source " + error.source);
-        console.log("upload error target " + error.target);
-    }
-
-    </script>
-  </head>
-  <body>
-    <form id="regform">
-
-
-        <input type="button" onclick="capturePhoto1();" value="Capture Photo"><br>
-        <img style="display:none;width:60px;height:60px;" id="smallImage1" src="" />
-
-        <input type="button" onclick="capturePhoto2();" value="Capture Photo"><br>
-        <img style="display:none;width:60px;height:60px;" id="smallImage2" src="" />
-
-        <input type="button" onclick="capturePhoto3();" value="Capture Photo"><br>
-        <img style="display:none;width:60px;height:60px;" id="smallImage3" src="" />
-
-        First Name: <input type="text" id="firstname" name="firstname"><br>
-        Last Name: <input type="text" id="lastname" name="lastname"><br>
-        Work Place: <input type="text" id="workplace" name="workPlace"><br>
-        <input type="button" id="btnSubmit" value="Submit" onclick="uploadPhoto();">
-    </form>
-  </body>
+            <button id='but_take'>Take photo</button>
+            <button id='but_select'>Select photo from Gallery</button>
+           
+        </div>
+        
+    </body>
 </html>
