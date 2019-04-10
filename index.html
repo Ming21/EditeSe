@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'" />
+        <title>PhoneGap app</title>
+    </head>
+    <body>
+        
+	<form id='file-catcher'>
+	  <input id='file-input' type='file' multiple/>
+	  <button type='submit'>
+		Submit Upload
+	  </button>
+	</form>
+
+	<div id='file-list-display'></div>
+	<br>
+	<div id='file-total-display'></div>
+
+        <!-- Script -->
+        <script type='text/javascript'>
+			 (function () {
+			  var fileCatcher = document.getElementById('file-catcher');
+			  var fileInput = document.getElementById('file-input');
+			  var fileListDisplay = document.getElementById('file-list-display');
+			  var fileTotal = document.getElementById('file-total-display');
+			  
+			  var fileList = [];
+			  var renderFileList, sendFile;
+			  
+			  fileCatcher.addEventListener('submit', function (evnt) {
+				evnt.preventDefault();
+				fileList.forEach(function (file) {
+					sendFile(file);
+				});
+			  });
+			  
+			  fileInput.addEventListener('change', function (evnt) {
+					fileList = [];
+				for (var i = 0; i < fileInput.files.length; i++) {
+					fileList.push(fileInput.files[i]);
+				}
+				renderFileList();
+			  });
+			  
+			  renderFileList = function () {
+				fileListDisplay.innerHTML = '';
+				var fileSizeTotal = 0;
+				var fileSizeUpload = 0;
+				var fileDisplayT = document.createElement('p');
+				
+				fileList.forEach(function (file, index) {
+					var fileDisplayEl = document.createElement('p');
+					
+					fileSizeUpload = file.size / 1024 / 1024;
+					fileSizeTotal = fileSizeTotal + file.size / 1024 / 1024;
+					var descFileSize = "";
+					//if (fileSizeUpload <= 0.9) { 
+					//	fileSizeUpload = fileSizeUpload * 1024;
+					//	descFileSize = " Size KB:" + fileSizeUpload.toFixed(3);
+					//}else {
+					//	fileSizeUpload = fileSizeUpload;
+						descFileSize = " Size MB:" + fileSizeUpload.toFixed(3);
+					//}
+
+				  fileDisplayEl.innerHTML = (index + 1) + ': ' + file.name + "  " + descFileSize ;
+				  
+				  fileListDisplay.appendChild(fileDisplayEl);
+				});
+				
+				fileDisplayT.innerHTML = "Total Size Arquivos MB: " + fileSizeTotal.toFixed(3);
+				fileTotal.appendChild( fileDisplayT  );
+			  };
+			  
+			  sendFile = function (file) {
+				var formData = new FormData();
+				var request = new XMLHttpRequest();
+				
+				alert("Solicitacao de Upload por POST");
+				formData.set('file', file);
+				request.open("POST", 'https://jsonplaceholder.typicode.com/photos');
+				request.send(formData);
+			  };
+			})();
+        </script>		
+
+    </body>
+</html>
